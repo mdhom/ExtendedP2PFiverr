@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Trajectories
 {
     public static class Iterator
     {
-        public static T IterateFromMax<T>(double valMin, double valMax, Func<double, IteratorStepResult<T>> validator)
+        public static T IterateFromMax<T>(double valMin, double valMax, Func<double, IteratorStepResult<T>> iteratorFunction)
         {
             double val = (valMin + valMax) / 2;
-            IteratorStepResult<T> stepResult = validator(val);
+
+            IteratorStepResult<T> stepResult = iteratorFunction(val);
+
             if (stepResult.EndSearch)
             {
                 return stepResult.Result;
@@ -17,11 +17,11 @@ namespace Trajectories
 
             if (stepResult.IterateDown)
             {
-                return IterateFromMax(valMin, val, validator);
+                return IterateFromMax(valMin, val, iteratorFunction);
             }
             else
             {
-                return IterateFromMax(val, valMax, validator);
+                return IterateFromMax(val, valMax, iteratorFunction);
             }
         }
     }
