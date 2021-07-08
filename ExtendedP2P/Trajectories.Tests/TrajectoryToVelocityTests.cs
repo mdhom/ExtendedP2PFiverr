@@ -27,7 +27,7 @@ namespace Trajectories.Tests
         [Fact]
         public void AccelerateFromVelocity()
         {
-            double vStart = 100.0;
+            double vStart = 50.0;
             double vTarget = 200.0;
             Trajectory trajectory = TrajectoryToVelocity.Calculate(0, vStart, vTarget, _motionParameter);
             trajectory.CalculateStatus(trajectory.TotalDuration, out double j, out double a, out double v, out double s);
@@ -35,7 +35,7 @@ namespace Trajectories.Tests
             Assert.Equal(_motionParameter.NegativeJerk, j, 1);
             Assert.Equal(0.0, a, 1);
             Assert.Equal(vTarget, v, 1);
-            Assert.Equal(300.0, s, 1);
+            Assert.Equal(312.5, s, 1);
         }
     }
 }

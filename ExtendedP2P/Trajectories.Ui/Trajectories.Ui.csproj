@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Trajectories\Trajectories.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TrajectoryToVelocity\" />
+  </ItemGroup>
+
 </Project>

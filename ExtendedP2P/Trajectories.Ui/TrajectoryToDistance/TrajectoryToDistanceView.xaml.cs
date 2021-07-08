@@ -16,13 +16,15 @@ using System.Windows.Shapes;
 namespace Trajectories.Ui
 {
     /// <summary>
-    /// Interaction logic for TrajectoriesView.xaml
+    /// Interaction logic for TrajectoryToDistanceView.xaml
     /// </summary>
-    public partial class TrajectoriesView : UserControl
+    public partial class TrajectoryToDistanceView : UserControl
     {
-        public TrajectoriesView()
+        public TrajectoryToDistanceView()
         {
             InitializeComponent();
+
+            DataContext = new TrajectoryToDistanceViewModel();
         }
     }
 }

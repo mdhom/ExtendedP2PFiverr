@@ -7,6 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1000">
     <Grid>
-        <local:TrajectoriesView DataContext="{Binding P2PFrom}" />
+        <TabControl>
+            <TabItem Header="To Velocity">
+                <local:TrajectoryToVelocityView />
+            </TabItem>
+            <TabItem Header="To Distance">
+                <local:TrajectoryToDistanceView />
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
