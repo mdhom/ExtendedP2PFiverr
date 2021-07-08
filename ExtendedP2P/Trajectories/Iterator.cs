@@ -6,22 +6,32 @@ namespace Trajectories
     {
         public static T IterateFromMax<T>(double valMin, double valMax, Func<double, IteratorStepResult<T>> iteratorFunction)
         {
-            double val = (valMin + valMax) / 2;
-
-            IteratorStepResult<T> stepResult = iteratorFunction(val);
-
-            if (stepResult.EndSearch)
+            int stepCount = 0;
+            while (true)
             {
-                return stepResult.Result;
-            }
+                double val = (valMin + valMax) / 2;
 
-            if (stepResult.IterateDown)
-            {
-                return IterateFromMax(valMin, val, iteratorFunction);
-            }
-            else
-            {
-                return IterateFromMax(val, valMax, iteratorFunction);
+                IteratorStepResult<T> stepResult = iteratorFunction(val);
+
+                if (stepResult.EndSearch)
+                {
+                    return stepResult.Result;
+                }
+
+                if (stepResult.IterateDown)
+                {
+                    valMax = val;
+                }
+                else
+                {
+                    valMin = val;
+                }
+                
+                stepCount++;
+                if (stepCount > 400)
+                {
+                    throw new Exception("No result found");
+                }
             }
         }
     }

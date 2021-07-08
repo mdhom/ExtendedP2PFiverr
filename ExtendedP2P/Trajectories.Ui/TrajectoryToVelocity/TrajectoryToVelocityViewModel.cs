@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using OxyPlot;
+using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using Servus.Core.Ui;
@@ -12,35 +13,35 @@ namespace Trajectories.Ui
 {
     public class TrajectoryToVelocityViewModel : Servus.Core.NotifyPropertyChangedBase
     {
-        private double _velocityMax = 200;
+        private double _velocityMax = 1500;
         public double VelocityMax
         {
             get => _velocityMax;
             set => ChangeProperty(value, ref _velocityMax, UpdateFromProperty);
         }
 
-        private double _jerkMax = 100;
+        private double _jerkMax = 300;
         public double JerkMax
         {
             get => _jerkMax;
             set => ChangeProperty(value, ref _jerkMax, UpdateFromProperty);
         }
 
-        private double _accelerationMax = 100;
+        private double _accelerationMax = 300;
         public double AccelerationMax
         {
             get => _accelerationMax;
             set => ChangeProperty(value, ref _accelerationMax, UpdateFromProperty);
         }
 
-        private double _acceleration0 = 0;
+        private double _acceleration0 = 500;
         public double Acceleration0
         {
             get => _acceleration0;
             set => ChangeProperty(value, ref _acceleration0, UpdateFromProperty);
         }
 
-        private double _velocity0 = 0;
+        private double _velocity0 = 500;
         public double Velocity0
         {
             get => _velocity0;
@@ -63,6 +64,7 @@ namespace Trajectories.Ui
         public PlotModel ModelVelocity { get; }
         public PlotModel ModelDistance { get; }
 
+        public ICommand RecalcCommand { get; }
         public ICommand ToggleRandomCommand { get; }
 
         private bool _randomRunning;
@@ -84,18 +86,22 @@ namespace Trajectories.Ui
             ModelJerk = new PlotModel();
             LinearAxis axisJerk = new LinearAxis() { Position = AxisPosition.Left, Title = "Jerk" };
             ModelJerk.Axes.Add(axisJerk);
+            AddHorizontalZeroLine(ModelJerk);
 
             ModelAcceleration = new PlotModel();
             LinearAxis axisAcceleration = new LinearAxis() { Position = AxisPosition.Left, Title = "Acceleration" };
             ModelAcceleration.Axes.Add(axisAcceleration);
+            AddHorizontalZeroLine(ModelAcceleration);
 
             ModelVelocity = new PlotModel();
             LinearAxis axisVelocity = new LinearAxis() { Position = AxisPosition.Left, Title = "Velocity" };
             ModelVelocity.Axes.Add(axisVelocity);
+            AddHorizontalZeroLine(ModelVelocity);
 
             ModelDistance = new PlotModel();
             LinearAxis axisDistance = new LinearAxis() { Position = AxisPosition.Left, Title = "Distance" };
             ModelDistance.Axes.Add(axisDistance);
+            AddHorizontalZeroLine(ModelDistance);
 
             ToggleRandomCommand = new RelayCommand(() =>
             {
@@ -110,7 +116,21 @@ namespace Trajectories.Ui
                 }
             });
 
+            RecalcCommand = new RelayCommand(UpdateFromProperty);
+
             Update();
+        }
+
+        private static void AddHorizontalZeroLine(PlotModel model)
+        {
+            LineAnnotation lineAnnotation = new LineAnnotation() {
+                StrokeThickness = 1,
+                Color = OxyColors.Gray,
+                Type = LineAnnotationType.Horizontal,
+                Text = "0",
+                Y = 0
+            };
+            model.Annotations.Add(lineAnnotation);
         }
 
         private Task RunRandom()

@@ -83,21 +83,53 @@ namespace Trajectories
                 return result;
             }
 
-            double decMax = MotionParams.MaximumDeceleration;
+            double accelerationAtStart = InitialAcceleration;
+            double velocityAtStart = InitialVelocity;
+            
+            double vAtAZero = TrajectoryToVelocity.v_at_a_zero(MotionParams, InitialAcceleration, InitialVelocity);
+            if (vAtAZero == targetVelocity ||
+                (result.Direction == RampDirection.Accelerate && InitialVelocity < targetVelocity && vAtAZero > targetVelocity) ||
+                (result.Direction == RampDirection.Decelerate && InitialVelocity > targetVelocity && vAtAZero < targetVelocity))
+            {
+                result.IsOvershootingAtStart = true;
+                result.Phase0Duration = TrajectoryToVelocity.t_at_a_zero(MotionParams, InitialAcceleration);
+                result.Phase0Length =
+                    TrajectoryToVelocity.s_at_a_zero(MotionParams, InitialAcceleration, InitialVelocity);
+                accelerationAtStart = 0;
+                velocityAtStart = vAtAZero;
+            }
+            else if (InitialAcceleration < 0 && InitialAcceleration < MotionParams.MaximumDeceleration)
+            {
+                // get acceleration down into range
+                double time = (MotionParams.MaximumDeceleration - InitialAcceleration) / (-MotionParams.PositiveJerk);
+            }
+            else if (InitialAcceleration > 0 && InitialAcceleration > MotionParams.MaximumAcceleration)
+            {
+                double time = (MotionParams.MaximumAcceleration - InitialAcceleration) / (MotionParams.NegativeJerk);
+                result.Phase0Duration = time;
+                result.Phase0Length = InitialVelocity * time + 0.5 * InitialAcceleration * time * time +
+                                      MotionParams.NegativeJerk * time * time * time / 6.0;
+                accelerationAtStart = MotionParams.MaximumAcceleration;
+                velocityAtStart = InitialVelocity + InitialAcceleration * time +
+                                  0.5 * MotionParams.NegativeJerk * time * time;
+            }
+
+
+            double aMax = MotionParams.MaximumDeceleration;
             double jPos = MotionParams.PositiveJerk;
             double jNeg = MotionParams.NegativeJerk;
             if (result.Direction == RampDirection.Accelerate)
             {
-                decMax = MotionParams.MaximumAcceleration;
+                aMax = MotionParams.MaximumAcceleration;
                 jPos = MotionParams.NegativeJerk;
                 jNeg = MotionParams.PositiveJerk;
             }
 
-            double a0 = InitialAcceleration;
-            double v0 = InitialVelocity;
-            double t1 = (decMax - a0) / jNeg;
+            double a0 = accelerationAtStart;
+            double v0 = velocityAtStart;
+            double t1 = (aMax - a0) / jNeg;
             double t2 = 0.0;
-            double t3 = -(decMax / jPos);
+            double t3 = -(aMax / jPos);
 
             // does profile reach constant a?
             double v_bya0_Ph1 = t1 * a0;
@@ -109,11 +141,11 @@ namespace Trajectories
             if (CheckForFlatRampPart(vTotal, targetVelocity, result.Direction))
             {
                 // constant a will be reached
-                t1 = (decMax - a0) / jNeg;
-                t3 = Math.Abs(decMax / jPos);
+                t1 = (aMax - a0) / jNeg;
+                t3 = Math.Abs(aMax / jPos);
                 double v_Dec = 0.5 * jNeg * (t1 * t1) + a0 * t1;
                 double v_Acc = -0.5 * jPos * (t3 * t3);
-                t2 = (targetVelocity - (v_Dec + v_Acc + v0)) / decMax;
+                t2 = (targetVelocity - (v_Dec + v_Acc + v0)) / aMax;
             }
             else
             {
@@ -178,8 +210,8 @@ namespace Trajectories
 
             double s3 = v2 * t3 + 0.5 * a2 * t3 * t3 + 1.0 / 6.0 * jPos * t3 * t3 * t3;
 
-            result.Length = s1 + s2 + s3;
-            result.TotalDuration = t1 + t2 + t3;
+            result.Length = s1 + s2 + s3 + result.Phase0Length;
+            result.TotalDuration = t1 + t2 + t3 + result.Phase0Duration;
             result.Phase1Duration = t1;
             result.Phase1Length = s1;
             result.Phase2Duration = t2;
@@ -233,7 +265,8 @@ namespace Trajectories
         /// <returns></returns>
         internal static double t_at_a_zero(MotionParameter motionParameter, double a0)
         {
-            return -a0 / motionParameter.NegativeJerk;
+            double j = a0 > 0 ? motionParameter.NegativeJerk : motionParameter.PositiveJerk;
+            return Math.Abs(a0 / j);
         }
 
         /// <summary>
@@ -245,7 +278,8 @@ namespace Trajectories
         /// <returns></returns>
         internal static double v_at_a_zero(MotionParameter motionParameter, double a0, double v0)
         {
-            return v0 - 0.5 * a0 * a0 / motionParameter.NegativeJerk;
+            double j = a0 > 0 ? motionParameter.NegativeJerk : motionParameter.PositiveJerk;
+            return v0 - 0.5 * a0 * a0 / j;
         }
 
         /// <summary>
@@ -258,7 +292,8 @@ namespace Trajectories
         /// <returns></returns>
         internal static double s_at_a_zero(MotionParameter motionParameter, double a0, double v0, double s0 = 0.0)
         {
-            return s0 - v0 * a0 / motionParameter.NegativeJerk + (a0 * a0 * a0 / (3 * motionParameter.NegativeJerk * motionParameter.NegativeJerk));
+            double j = a0 > 0 ? motionParameter.NegativeJerk : motionParameter.PositiveJerk;
+            return s0 - v0 * a0 / j + (a0 * a0 * a0 / (3 * j * j));
         }
     }
 }

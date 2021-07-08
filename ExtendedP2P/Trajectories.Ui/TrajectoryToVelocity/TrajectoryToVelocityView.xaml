@@ -50,12 +50,18 @@
                 <TextBlock Text="{Binding CalculationTime}" Margin="0,0,10,0" />
             </StackPanel>
 
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+            </StackPanel.Resources>
+            <Button Content="Recalc" Command="{Binding RecalcCommand}" />
             <Button Content="Random" Command="{Binding ToggleRandomCommand}" />
             <StackPanel Visibility="{Binding RandomRunning, Converter={StaticResource BooleanToVisibility}}">
                 <TextBlock Text="Random running" />
                 <TextBlock Text="{Binding RandomCount}"/>
             </StackPanel>
-
         </StackPanel>
 
         <oxy:PlotView Model="{Binding ModelJerk}" Grid.Row="1" />

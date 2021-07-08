@@ -57,8 +57,27 @@ namespace Trajectories.Tests
             trajectory.CalculateStatus(ta0, out _, out _, out double v, out double s);
             Assert.Equal(va0, v, 1);
             Assert.Equal(sa0, s, 1);
+        }
+
+        [Fact]
+        public void CalculationNegativeA0()
+        {
+            const double a0 = -100;
+            const double v0 = 50;
             
-            
+            double ta0 = TrajectoryToVelocity.t_at_a_zero(_motionParameter, a0);
+            Assert.Equal(1.0, ta0, 1);
+
+            double va0 = TrajectoryToVelocity.v_at_a_zero(_motionParameter, a0, v0);
+            Assert.Equal(0.0, va0, 1);
+
+            double sa0 = TrajectoryToVelocity.s_at_a_zero(_motionParameter, a0, v0);
+            Assert.Equal(16.666, sa0, 1);
+
+            Trajectory trajectory = TrajectoryToVelocity.Calculate(a0, v0, 0, _motionParameter);
+            trajectory.CalculateStatus(ta0, out _, out _, out double v, out double s);
+            Assert.Equal(va0, v, 1);
+            Assert.Equal(sa0, s, 1);
         }
     }
 }
