@@ -43,7 +43,7 @@ namespace Trajectories.Ui
             set => ChangeProperty(value, ref _velocity0, Update);
         }
 
-        public double Elapsed { get; private set; }
+        public string CalculationTime { get; private set; }
         public double ResultDuration { get; private set; }
         public double ResultMaxReachedVelocity { get; private set; }
         public int ResultTrajectoryInstanceCase { get; private set; }
@@ -98,7 +98,7 @@ namespace Trajectories.Ui
                 DateTime started = DateTime.Now;
                 Trajectory trajectory = TrajectoryToVelocity.Calculate(Acceleration0, Velocity0, VelocityMax, motionParameter);
                 DateTime completed = DateTime.Now;
-                Elapsed = (completed - started).TotalMilliseconds;
+                CalculationTime = $"{(completed - started).TotalMilliseconds:0.000} ms";
 
                 ResultDuration = trajectory.TotalDuration;
                 for (double t = 0; t <= ResultDuration + 0.002; t += 0.001)
@@ -140,7 +140,7 @@ namespace Trajectories.Ui
             OnPropertyChanged(nameof(DataV));
             OnPropertyChanged(nameof(DataS));
             OnPropertyChanged(nameof(DataBrakingDistance));
-            OnPropertyChanged(nameof(Elapsed));
+            OnPropertyChanged(nameof(CalculationTime));
             OnPropertyChanged(nameof(ResultDuration));
             OnPropertyChanged(nameof(ResultTrajectoryInstanceCase));
             OnPropertyChanged(nameof(ResultMaxReachedVelocity));

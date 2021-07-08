@@ -54,7 +54,7 @@ namespace Trajectories.Ui
         }
 
         public TrajectoryToDistanceCalculationStatus Status { get; private set; }
-        public double Elapsed { get; private set; }
+        public string CalculationTime { get; private set; }
         public double ResultDuration { get; private set; }
         public double ResultDistance { get; private set; }
         public double ResultDistanceDifference { get; private set; }
@@ -111,7 +111,7 @@ namespace Trajectories.Ui
                 DateTime started = DateTime.Now;
                 TrajectoryToDistanceResult result = TrajectoryToDistance.Calculate(TargetDistance, VelocityMax, Velocity0, Acceleration0, motionParameter);
                 DateTime completed = DateTime.Now;
-                Elapsed = (completed - started).TotalMilliseconds;
+                CalculationTime = $"{(completed - started).TotalMilliseconds:0.000} ms";
                 Status = result.CalculationStatus;
                 if (Status == TrajectoryToDistanceCalculationStatus.Ok)
                 {
@@ -158,7 +158,7 @@ namespace Trajectories.Ui
             OnPropertyChanged(nameof(DataV));
             OnPropertyChanged(nameof(DataS));
             OnPropertyChanged(nameof(DataBrakingDistance));
-            OnPropertyChanged(nameof(Elapsed));
+            OnPropertyChanged(nameof(CalculationTime));
             OnPropertyChanged(nameof(ResultDuration));
             OnPropertyChanged(nameof(ResultTrajectoryInstanceCase));
             OnPropertyChanged(nameof(ResultDistance));

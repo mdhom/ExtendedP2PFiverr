@@ -43,8 +43,8 @@
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Text="Elapsed: " />
-                <TextBlock Text="{Binding Elapsed}" Margin="0,0,10,0" />
+                <TextBlock Text="CalculationTime: " />
+                <TextBlock Text="{Binding CalculationTime}" Margin="0,0,10,0" />
             </StackPanel>
 
         </StackPanel>
