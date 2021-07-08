@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1000">
     <Grid>
-        <local:P2PFromView DataContext="{Binding P2PFrom}" />
+        <local:TrajectoriesView DataContext="{Binding P2PFrom}" />
     </Grid>
 </Window>

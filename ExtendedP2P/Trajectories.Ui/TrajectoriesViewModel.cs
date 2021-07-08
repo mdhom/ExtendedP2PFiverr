@@ -9,9 +9,8 @@ using OxyPlot.Series;
 
 namespace Trajectories.Ui
 {
-    public class P2PFromViewModel : Servus.Core.NotifyPropertyChangedBase
+    public class TrajectoriesViewModel : Servus.Core.NotifyPropertyChangedBase
     {
-
         private double _targetDistance = 15000;
         public double TargetDistance
         {
@@ -73,7 +72,7 @@ namespace Trajectories.Ui
         public PlotModel ModelVelocity { get; }
         public PlotModel ModelDistance { get; }
 
-        public P2PFromViewModel()
+        public TrajectoriesViewModel()
         {
             ModelJerk = new PlotModel();
             LinearAxis axisJerk = new LinearAxis() { Position = AxisPosition.Left, Title="Jerk" };

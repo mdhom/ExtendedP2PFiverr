@@ -8,11 +8,11 @@ namespace Trajectories.Ui
 {
     public class MainViewModel
     {
-        public P2PFromViewModel P2PFrom { get; }
+        public TrajectoriesViewModel P2PFrom { get; }
 
         public MainViewModel()
         {
-            P2PFrom = new P2PFromViewModel();
+            P2PFrom = new TrajectoriesViewModel();
         }
     }
 }

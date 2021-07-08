@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Trajectories.Ui
 {
     /// <summary>
-    /// Interaction logic for P2PFromView.xaml
+    /// Interaction logic for TrajectoriesView.xaml
     /// </summary>
-    public partial class P2PFromView : UserControl
+    public partial class TrajectoriesView : UserControl
     {
-        public P2PFromView()
+        public TrajectoriesView()
         {
             InitializeComponent();
         }
