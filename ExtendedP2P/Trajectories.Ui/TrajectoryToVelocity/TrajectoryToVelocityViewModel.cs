@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using Servus.Core.Ui;
 
 namespace Trajectories.Ui
 {
@@ -12,35 +15,35 @@ namespace Trajectories.Ui
         public double VelocityMax
         {
             get => _velocityMax;
-            set => ChangeProperty(value, ref _velocityMax, Update);
+            set => ChangeProperty(value, ref _velocityMax, UpdateFromProperty);
         }
 
         private double _jerkMax = 100;
         public double JerkMax
         {
             get => _jerkMax;
-            set => ChangeProperty(value, ref _jerkMax, Update);
+            set => ChangeProperty(value, ref _jerkMax, UpdateFromProperty);
         }
 
         private double _accelerationMax = 100;
         public double AccelerationMax
         {
             get => _accelerationMax;
-            set => ChangeProperty(value, ref _accelerationMax, Update);
+            set => ChangeProperty(value, ref _accelerationMax, UpdateFromProperty);
         }
 
         private double _acceleration0 = 0;
         public double Acceleration0
         {
             get => _acceleration0;
-            set => ChangeProperty(value, ref _acceleration0, Update);
+            set => ChangeProperty(value, ref _acceleration0, UpdateFromProperty);
         }
 
         private double _velocity0 = 0;
         public double Velocity0
         {
             get => _velocity0;
-            set => ChangeProperty(value, ref _velocity0, Update);
+            set => ChangeProperty(value, ref _velocity0, UpdateFromProperty);
         }
 
         public string CalculationTime { get; private set; }
@@ -59,10 +62,26 @@ namespace Trajectories.Ui
         public PlotModel ModelVelocity { get; }
         public PlotModel ModelDistance { get; }
 
+        public ICommand ToggleRandomCommand { get; }
+
+        private bool _randomRunning;
+        public bool RandomRunning
+        {
+            get => _randomRunning;
+            set => ChangeProperty(value, ref _randomRunning, UpdateFromProperty);
+        }
+
+        private int _randomCount;
+        public int RandomCount
+        {
+            get => _randomCount;
+            set => ChangeProperty(value, ref _randomCount, UpdateFromProperty);
+        }
+
         public TrajectoryToVelocityViewModel()
         {
             ModelJerk = new PlotModel();
-            LinearAxis axisJerk = new LinearAxis() { Position = AxisPosition.Left, Title="Jerk" };
+            LinearAxis axisJerk = new LinearAxis() { Position = AxisPosition.Left, Title = "Jerk" };
             ModelJerk.Axes.Add(axisJerk);
 
             ModelAcceleration = new PlotModel();
@@ -77,10 +96,53 @@ namespace Trajectories.Ui
             LinearAxis axisDistance = new LinearAxis() { Position = AxisPosition.Left, Title = "Distance" };
             ModelDistance.Axes.Add(axisDistance);
 
+            ToggleRandomCommand = new RelayCommand(() =>
+            {
+                if (RandomRunning)
+                {
+                    RandomRunning = false;
+                }
+                else
+                {
+                    RandomRunning = true;
+                    Task.Run(RunRandom);
+                }
+            });
+
             Update();
         }
 
-        private void Update()
+        private async Task RunRandom()
+        {
+            Random random = new Random((int)DateTime.Now.Ticks);
+            while (_randomRunning)
+            {
+                VelocityMax = RandomInRange(random, 5, 1000);
+                AccelerationMax = RandomInRange(random, 5, 1000);
+                JerkMax = RandomInRange(random, 5, 1000);
+                Velocity0 = RandomInRange(random, 0, 1000);
+                Acceleration0 = RandomInRange(random, -200, 200);
+                if (!Update())
+                {
+                    RandomRunning = false;
+                    return;
+                }
+                RandomCount++;
+                await Task.Delay(RandomCount % 100 == 0 ? 50 : 10);
+            }
+        }
+
+        private static double RandomInRange(Random random, double min, double max)
+        {
+            return min + random.NextDouble() * (max - min);
+        }
+
+        private void UpdateFromProperty()
+        {
+            Update();
+        }
+
+        private bool Update()
         {
             DataJ = new List<DataPoint>();
             DataA = new List<DataPoint>();
@@ -91,6 +153,7 @@ namespace Trajectories.Ui
             ResultTrajectoryInstanceCase = 0;
             ResultMaxReachedVelocity = 0;
 
+            bool success = true;
             try
             {
                 MotionParameter motionParameter = new MotionParameter(JerkMax, -JerkMax, AccelerationMax, -AccelerationMax);
@@ -116,6 +179,7 @@ namespace Trajectories.Ui
             }
             catch (Exception ex)
             {
+                success = false;
                 Console.WriteLine($"Exception: {ex.Message}\r\n{ex.StackTrace}");
             }
 
@@ -144,6 +208,8 @@ namespace Trajectories.Ui
             OnPropertyChanged(nameof(ResultDuration));
             OnPropertyChanged(nameof(ResultTrajectoryInstanceCase));
             OnPropertyChanged(nameof(ResultMaxReachedVelocity));
+
+            return success;
         }
     }
 }

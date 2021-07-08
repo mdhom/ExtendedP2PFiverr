@@ -17,6 +17,9 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+            <StackPanel.Resources>
+                <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+            </StackPanel.Resources>
             <StackPanel>
                 <TextBlock Text="jMax [mm/s³]: " />
                 <TextBox Text="{Binding JerkMax}" Width="100" Margin="0,0,10,0" />
@@ -45,6 +48,12 @@
             <StackPanel>
                 <TextBlock Text="CalculationTime: " />
                 <TextBlock Text="{Binding CalculationTime}" Margin="0,0,10,0" />
+            </StackPanel>
+
+            <Button Content="Random" Command="{Binding ToggleRandomCommand}" />
+            <StackPanel Visibility="{Binding RandomRunning, Converter={StaticResource BooleanToVisibility}}">
+                <TextBlock Text="Random running" />
+                <TextBlock Text="{Binding RandomCount}"/>
             </StackPanel>
 
         </StackPanel>
