@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace ExtendedP2P.Tests
+namespace Trajectories.Tests
 {
     public class UnitTest1
     {

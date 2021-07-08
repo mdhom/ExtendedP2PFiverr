@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ExtendedP2P\ExtendedP2P.csproj" />
+    <ProjectReference Include="..\Trajectories\Trajectories.csproj" />
   </ItemGroup>
 
 </Project>

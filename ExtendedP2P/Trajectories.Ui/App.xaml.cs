@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ExtendedP2P.Ui
+namespace Trajectories.Ui
 {
     /// <summary>
     /// Interaction logic for App.xaml

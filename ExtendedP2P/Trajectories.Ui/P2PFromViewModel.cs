@@ -7,7 +7,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 
-namespace ExtendedP2P.Ui
+namespace Trajectories.Ui
 {
     public class P2PFromViewModel : Servus.Core.NotifyPropertyChangedBase
     {
@@ -114,21 +114,24 @@ namespace ExtendedP2P.Ui
                 DateTime completed = DateTime.Now;
                 Elapsed = (completed - started).TotalMilliseconds;
                 Status = result.CalculationStatus;
-                ResultDistance = result.TrajectoryChain.Distance;
-                ResultDistanceDifference = TargetDistance - ResultDistance;
-                ResultDuration = result.TrajectoryChain.Duration;
-                for (double t = 0; t <= ResultDuration + 0.002; t += 0.001)
+                if (Status == TrajectoryToDistanceCalculationStatus.Ok)
                 {
-                    result.TrajectoryChain.GetStatus(t, out double j, out double a, out double v, out double s);
-                    DataJ.Add(new DataPoint(t, j));
-                    DataA.Add(new DataPoint(t, a));
-                    DataV.Add(new DataPoint(t, v));
-                    DataS.Add(new DataPoint(t, s));
-                    //DataBrakingDistance.Add(new DataPoint(t, calc.GetBrakingDistance(t)));
-                }
+                    ResultDistance = result.TrajectoryChain.Distance;
+                    ResultDistanceDifference = TargetDistance - ResultDistance;
+                    ResultDuration = result.TrajectoryChain.Duration;
+                    for (double t = 0; t <= ResultDuration + 0.002; t += 0.001)
+                    {
+                        result.TrajectoryChain.GetStatus(t, out double j, out double a, out double v, out double s);
+                        DataJ.Add(new DataPoint(t, j));
+                        DataA.Add(new DataPoint(t, a));
+                        DataV.Add(new DataPoint(t, v));
+                        DataS.Add(new DataPoint(t, s));
+                        //DataBrakingDistance.Add(new DataPoint(t, calc.GetBrakingDistance(t)));
+                    }
 
-                //ResultTrajectoryInstanceCase = calc.TrajectoryInstanceCase;
-                //ResultMaxReachedVelocity = calc.CalculateMaximumReachedVelocity();
+                    //ResultTrajectoryInstanceCase = calc.TrajectoryInstanceCase;
+                    //ResultMaxReachedVelocity = calc.CalculateMaximumReachedVelocity();
+                }
             }
             catch (Exception ex)
             {

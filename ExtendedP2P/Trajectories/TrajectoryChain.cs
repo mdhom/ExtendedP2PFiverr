@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExtendedP2P
+namespace Trajectories
 {
     public class TrajectoryChain
     {

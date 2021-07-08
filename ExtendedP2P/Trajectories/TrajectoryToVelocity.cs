@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExtendedP2P
+namespace Trajectories
 {
     public class TrajectoryToVelocity
     {

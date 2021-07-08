@@ -1,4 +1,4 @@
-﻿namespace ExtendedP2P
+﻿namespace Trajectories
 {
     public enum RampDirection
     {

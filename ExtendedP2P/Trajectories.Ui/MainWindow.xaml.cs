@@ -13,16 +13,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ExtendedP2P.Ui
+namespace Trajectories.Ui
 {
     /// <summary>
-    /// Interaction logic for P2PFromView.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class P2PFromView : UserControl
+    public partial class MainWindow : Window
     {
-        public P2PFromView()
+        public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = new MainViewModel();
         }
     }
 }

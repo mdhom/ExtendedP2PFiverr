@@ -1,5 +1,5 @@
 ﻿
-namespace ExtendedP2P
+namespace Trajectories
 {
     public struct MotionParameter
     {
