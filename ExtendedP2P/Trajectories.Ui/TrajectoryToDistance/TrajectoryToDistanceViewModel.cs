@@ -162,8 +162,18 @@ namespace Trajectories.Ui
             JerkMax = RandomInRange(random, 100, 5000);
             AccelerationMax = JerkMax / RandomInRange(random, 1, 10);
             VelocityMax = RandomInRange(random, 100, 1000);
-            Acceleration0 = RandomInRange(random, -_accelerationMax, _accelerationMax);
-            Velocity0 = RandomInRange(random, 0, 1000);
+
+            double distance = RandomInRange(random, 100, 10000);
+            TrajectoryToDistanceResult result = TrajectoryToDistance.Calculate(distance, VelocityMax, 0, 0,
+                new MotionParameter(JerkMax, -JerkMax, AccelerationMax, -AccelerationMax));
+            Console.WriteLine($"Source Trajectory: distance={distance}, duration={result.TrajectoryChain.TotalDuration:.2} JerkMax={JerkMax}, AccelerationMax={AccelerationMax}, VelocityMax={VelocityMax}");
+            
+            double t = RandomInRange(random, 0, result.TrajectoryChain.TotalDuration);
+            result.TrajectoryChain.GetStatus(t, out _, out double a, out double v, out _);
+            Console.WriteLine($"New Trajectory: t={t}, a={a}, v={v}");
+            
+            Acceleration0 = a;
+            Velocity0 = v;
             
             _updatingBatch = false;
             
