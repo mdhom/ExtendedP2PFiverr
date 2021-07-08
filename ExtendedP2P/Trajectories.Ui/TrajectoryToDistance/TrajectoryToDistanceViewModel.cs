@@ -117,7 +117,7 @@ namespace Trajectories.Ui
                 {
                     ResultDistance = result.TrajectoryChain.Distance;
                     ResultDistanceDifference = TargetDistance - ResultDistance;
-                    ResultDuration = result.TrajectoryChain.Duration;
+                    ResultDuration = result.TrajectoryChain.TotalDuration;
                     for (double t = 0; t <= ResultDuration + 0.002; t += 0.001)
                     {
                         result.TrajectoryChain.GetStatus(t, out double j, out double a, out double v, out double s);

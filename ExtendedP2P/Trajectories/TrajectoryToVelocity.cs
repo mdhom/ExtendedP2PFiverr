@@ -52,9 +52,6 @@ namespace Trajectories
             return Calculate(initialVelocity, targetVelocity, motionParameter).IsReachable(distanceAvailable);
         }
 
-
-        #region Calculation
-
         private RampDirection GetDirection(double targetVelocity)
         {
             if (Math.Abs(InitialVelocity - targetVelocity) < 1e-8)
@@ -114,9 +111,9 @@ namespace Trajectories
                 // constant a will be reached
                 t1 = (decMax - a0) / jNeg;
                 t3 = Math.Abs(decMax / jPos);
-                double v_Decc = 0.5 * jNeg * (t1 * t1) + a0 * t1;
+                double v_Dec = 0.5 * jNeg * (t1 * t1) + a0 * t1;
                 double v_Acc = -0.5 * jPos * (t3 * t3);
-                t2 = (targetVelocity - (v_Decc + v_Acc + v0)) / decMax;
+                t2 = (targetVelocity - (v_Dec + v_Acc + v0)) / decMax;
             }
             else
             {
@@ -153,14 +150,14 @@ namespace Trajectories
                     Inverted = result.Direction != RampDirection.Accelerate;
                 }
 
-                if (Inverted)  // Beschleuningen falls wir bremsen ---> Bremsen falls beschleunigen
+                if (Inverted)  // accelerate if decelerating ---> decelerate if accelerating
                 {
                     double tmp = jNeg;
                     jNeg = jPos;
                     jPos = tmp;
                 }
 
-                // 4. Gleichungssystem, um t1,t2 und t3 zu bestimmen
+                // 4. system of equations to determine t1,t2 und t3
                 double a = 0.5 * jNeg - 0.5 * (jNeg * jNeg / jPos);
                 double b = a0 - a0 * (jNeg / jPos);
                 double c = v0 - targetVelocity - a0 * a0 / (2 * jPos);
@@ -228,6 +225,40 @@ namespace Trajectories
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Calculates the time needed to reduce acceleration a0 to zero.
+        /// </summary>
+        /// <param name="motionParameter"></param>
+        /// <param name="a0">Initial acceleration</param>
+        /// <returns></returns>
+        internal static double t_at_a_zero(MotionParameter motionParameter, double a0)
+        {
+            return -a0 / motionParameter.NegativeJerk;
+        }
+
+        /// <summary>
+        /// Calculates the velocity after reducing acceleration a0 to zero
+        /// </summary>
+        /// <param name="motionParameter"></param>
+        /// <param name="a0">Initial acceleration</param>
+        /// <param name="v0">Initial velocity</param>
+        /// <returns></returns>
+        internal static double v_at_a_zero(MotionParameter motionParameter, double a0, double v0)
+        {
+            return v0 - 0.5 * a0 * a0 / motionParameter.NegativeJerk;
+        }
+
+        /// <summary>
+        /// Calculates the distance traveled after reducing acceleration a0 to zero
+        /// </summary>
+        /// <param name="motionParameter"></param>
+        /// <param name="a0">Initial acceleration</param>
+        /// <param name="v0">Initial velocity</param>
+        /// <param name="s0">Initial distance</param>
+        /// <returns></returns>
+        internal static double s_at_a_zero(MotionParameter motionParameter, double a0, double v0, double s0 = 0.0)
+        {
+            return s0 - v0 * a0 / motionParameter.NegativeJerk + (a0 * a0 * a0 / (3 * motionParameter.NegativeJerk * motionParameter.NegativeJerk));
+        }
     }
 }

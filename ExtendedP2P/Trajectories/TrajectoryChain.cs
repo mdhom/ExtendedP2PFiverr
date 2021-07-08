@@ -10,7 +10,7 @@ namespace Trajectories
 
         public double Distance { get; }
 
-        public double Duration { get; }
+        public double TotalDuration { get; }
 
         public TrajectoryChain(Trajectory[] trajectories)
         {
@@ -19,7 +19,7 @@ namespace Trajectories
             foreach (Trajectory ramp in _trajectories)
             {
                 Distance += ramp.Length;
-                Duration += ramp.TotalDuration;
+                TotalDuration += ramp.TotalDuration;
             }
         }
 
@@ -50,6 +50,21 @@ namespace Trajectories
             }
 
             GetStatus(tSum, out j, out a, out v, out s);
+        }
+
+        public void Validate(double timeStep = 0.001)
+        {
+            var vLast = _trajectories[0].vFrom;
+            var sLast = 0.0;
+            for (double t = 0; t <= TotalDuration + 0.1; t += timeStep)
+            {
+                GetStatus(t, out var j, out var a, out var v, out var s);
+
+                Trajectory.ValidateContinuity(vLast, sLast, a, v, s, timeStep);
+
+                vLast = v;
+                sLast = s;
+            }
         }
     }
 }

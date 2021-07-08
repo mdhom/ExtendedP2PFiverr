@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using OxyPlot;
@@ -68,14 +69,14 @@ namespace Trajectories.Ui
         public bool RandomRunning
         {
             get => _randomRunning;
-            set => ChangeProperty(value, ref _randomRunning, UpdateFromProperty);
+            set => ChangeProperty(value, ref _randomRunning);
         }
 
         private int _randomCount;
         public int RandomCount
         {
             get => _randomCount;
-            set => ChangeProperty(value, ref _randomCount, UpdateFromProperty);
+            set => ChangeProperty(value, ref _randomCount);
         }
 
         public TrajectoryToVelocityViewModel()
@@ -112,24 +113,33 @@ namespace Trajectories.Ui
             Update();
         }
 
-        private async Task RunRandom()
+        private Task RunRandom()
         {
             Random random = new Random((int)DateTime.Now.Ticks);
-            while (_randomRunning)
+            const int batchSize = 1000;
+            while (RandomRunning)
             {
-                VelocityMax = RandomInRange(random, 5, 1000);
-                AccelerationMax = RandomInRange(random, 5, 1000);
-                JerkMax = RandomInRange(random, 5, 1000);
-                Velocity0 = RandomInRange(random, 0, 1000);
-                Acceleration0 = RandomInRange(random, -200, 200);
-                if (!Update())
-                {
-                    RandomRunning = false;
-                    return;
-                }
-                RandomCount++;
-                await Task.Delay(RandomCount % 100 == 0 ? 50 : 10);
+                _ = Parallel.For(0, batchSize, (i) =>
+                  {
+                      CalculateRandom(random);
+                  });
+                RandomCount += batchSize;
             }
+
+            return Task.CompletedTask;
+        }
+
+        private static void CalculateRandom(Random random)
+        {
+            double jerkMax = RandomInRange(random, 5, 1000);
+            double accelerationMax = RandomInRange(random, 5, 1000);
+            double velocityMax = RandomInRange(random, 5, 1000);
+            double acceleration0 = RandomInRange(random, -accelerationMax, accelerationMax);
+            double velocity0 = RandomInRange(random, 0, 1000);
+
+            MotionParameter motionParameter = new MotionParameter(jerkMax, -jerkMax, accelerationMax, -accelerationMax);
+            Trajectory trajectory = TrajectoryToVelocity.Calculate(acceleration0, velocity0, velocityMax, motionParameter);
+            trajectory.Validate();
         }
 
         private static double RandomInRange(Random random, double min, double max)
@@ -171,11 +181,9 @@ namespace Trajectories.Ui
                     DataA.Add(new DataPoint(t, a));
                     DataV.Add(new DataPoint(t, v));
                     DataS.Add(new DataPoint(t, s));
-                    //DataBrakingDistance.Add(new DataPoint(t, calc.GetBrakingDistance(t)));
                 }
 
-                //ResultTrajectoryInstanceCase = calc.TrajectoryInstanceCase;
-                //ResultMaxReachedVelocity = calc.CalculateMaximumReachedVelocity();
+                trajectory.Validate();
             }
             catch (Exception ex)
             {

@@ -9,12 +9,12 @@ namespace Trajectories.Tests
 {
     public class TrajectoryToVelocityTests
     {
-        private MotionParameter _motionParameter = new MotionParameter(100, -100, 100, -100);
+        private readonly MotionParameter _motionParameter = new MotionParameter(100, -100, 100, -100);
 
         [Fact]
         public void AccelerateFromZero()
         {
-            double vTarget = 200.0;
+            const double vTarget = 200.0;
             Trajectory trajectory = TrajectoryToVelocity.Calculate(0, 0, vTarget, _motionParameter);
             trajectory.CalculateStatus(trajectory.TotalDuration, out double j, out double a, out double v, out double s);
 
@@ -27,8 +27,8 @@ namespace Trajectories.Tests
         [Fact]
         public void AccelerateFromVelocity()
         {
-            double vStart = 50.0;
-            double vTarget = 200.0;
+            const double vStart = 50.0;
+            const double vTarget = 200.0;
             Trajectory trajectory = TrajectoryToVelocity.Calculate(0, vStart, vTarget, _motionParameter);
             trajectory.CalculateStatus(trajectory.TotalDuration, out double j, out double a, out double v, out double s);
 
@@ -36,6 +36,29 @@ namespace Trajectories.Tests
             Assert.Equal(0.0, a, 1);
             Assert.Equal(vTarget, v, 1);
             Assert.Equal(312.5, s, 1);
+        }
+
+        [Fact]
+        public void Calculation()
+        {
+            const double a0 = 100;
+            const double v0 = 100;
+            
+            double ta0 = TrajectoryToVelocity.t_at_a_zero(_motionParameter, a0);
+            Assert.Equal(1.0, ta0, 1);
+
+            double va0 = TrajectoryToVelocity.v_at_a_zero(_motionParameter, a0, v0);
+            Assert.Equal(150.0, va0, 1);
+
+            double sa0 = TrajectoryToVelocity.s_at_a_zero(_motionParameter, a0, v0);
+            Assert.Equal(133.333, sa0, 1);
+
+            Trajectory trajectory = TrajectoryToVelocity.Calculate(a0, v0, 0, _motionParameter);
+            trajectory.CalculateStatus(ta0, out _, out _, out double v, out double s);
+            Assert.Equal(va0, v, 1);
+            Assert.Equal(sa0, s, 1);
+            
+            
         }
     }
 }

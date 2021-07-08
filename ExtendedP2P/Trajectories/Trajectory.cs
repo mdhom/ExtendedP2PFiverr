@@ -1,4 +1,6 @@
-﻿namespace Trajectories
+﻿using System;
+
+namespace Trajectories
 {
     public class Trajectory
     {
@@ -124,6 +126,36 @@
             aOut = a2 - jMax * tPhase;
             vOut = v2 + a2 * tPhase + 0.5 * -jMax * tPhase2;
             sOut = s2 + v2 * tPhase + 0.5 * a2 * tPhase2 + -jMax / 6 * tPhase3;
+        }
+
+        public void Validate(double timeStep=0.001)
+        {
+            var vLast = vFrom;
+            var sLast = 0.0;
+            for (double t = 0; t <= TotalDuration + 0.1; t += timeStep)
+            {
+                CalculateStatus(t, out var j, out var a, out var v, out var s);
+
+                ValidateContinuity(vLast, sLast, a, v, s, timeStep);
+
+                vLast = v;
+                sLast = s;
+            }
+        }
+
+        public static void ValidateContinuity(double v0, double s0, double a1, double v1, double s1, double timeStep)
+        {
+            var deltaV = v1 - v0;
+            var deltaS = s1 - s0;
+
+            if (deltaS > 0.1 && Math.Abs(deltaS) > Math.Abs(1.5 * timeStep * v1))
+            {
+                throw new Exception($"Discontinuity in Distance: deltaS={deltaS}, s={s1}, s0={s0}, v1={v1}");
+            }
+            if (deltaV > 0.1 && Math.Abs(deltaV) > Math.Abs(1.5 * timeStep * a1))
+            {
+                throw new Exception($"Discontinuity in Velocity: deltaV={deltaV}, v={v1}, v0={v0}, a1={a1}");
+            }
         }
     }
 }
