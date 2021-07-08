@@ -31,13 +31,13 @@ namespace ExtendedP2P
             {
                 // quadratic equation ax²+bx+c=0
                 // solve with "Mitternachtsformel"
-                var determinant = b * b - 4 * a * c;
+                double determinant = b * b - 4 * a * c;
                 if (determinant < 0)
                 {
                     return false;
                 }
 
-                var root = Math.Sqrt(determinant);
+                double root = Math.Sqrt(determinant);
                 x1 = (-b + root) / (2 * a);
                 x2 = (-b - root) / (2 * a);
                 return true;
