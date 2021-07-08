@@ -202,16 +202,18 @@ namespace Trajectories
 
         public static void ValidateContinuity(double v0, double s0, double a1, double v1, double s1, double timeStep)
         {
-            double deltaV = v1 - v0;
             double deltaS = s1 - s0;
-
-            if (deltaS > 0.1 && Math.Abs(deltaS) > Math.Abs(1.5 * timeStep * v1))
+            double thresholdS = Math.Abs(1.5 * timeStep * v1);
+            if (deltaS > 0.1 && Math.Abs(deltaS) > thresholdS)
             {
-                throw new Exception($"Discontinuity in Distance: deltaS={deltaS}, s={s1}, s0={s0}, v1={v1}");
+                throw new Exception($"Discontinuity in Distance: deltaS={deltaS}, thresholdS={thresholdS}, s={s1}, s0={s0}, v1={v1}");
             }
-            if (deltaV > 0.1 && Math.Abs(deltaV) > Math.Abs(1.5 * timeStep * a1))
+            
+            double deltaV = v1 - v0;
+            double thresholdV = Math.Abs(1.5 * timeStep * a1);
+            if (deltaV > 0.1 && Math.Abs(deltaV) > thresholdV)
             {
-                throw new Exception($"Discontinuity in Velocity: deltaV={deltaV}, v={v1}, v0={v0}, a1={a1}");
+                throw new Exception($"Discontinuity in Velocity: deltaV={deltaV}, thresholdV={thresholdV}, v={v1}, v0={v0}, a1={a1}");
             }
         }
     }

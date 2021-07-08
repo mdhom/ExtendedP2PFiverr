@@ -158,11 +158,13 @@ namespace Trajectories.Ui
         private void CalculateRandom(Random random)
         {
             _updatingBatch = true;
-            JerkMax = RandomInRange(random, 5, 1000);
-            AccelerationMax = RandomInRange(random, 5, 1000);
+            
+            JerkMax = RandomInRange(random, 100, 5000);
+            AccelerationMax = JerkMax / RandomInRange(random, 1, 10);
             VelocityMax = RandomInRange(random, 100, 1000);
             Acceleration0 = RandomInRange(random, -_accelerationMax, _accelerationMax);
             Velocity0 = RandomInRange(random, 0, 1000);
+            
             _updatingBatch = false;
             
             Update();
